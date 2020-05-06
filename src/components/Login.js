@@ -226,7 +226,7 @@ const LoginPage = ({ history, setIsLoggedIn, setUserData }) => {
               <TextWithPopover text="Forgot Username / Password?" popoverText="Ohh that's bad :((" />
             </div>
             <div style={styles.createAccountText}>
-              <TextWithPopover text="Created your account" popoverText="No can do :))" />
+              <TextWithPopover text="Create your account" popoverText="No can do :))" />
             </div>
           </div>
         </div>
