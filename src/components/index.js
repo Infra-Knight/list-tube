@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 
 import Login from './Login';
 import UserHome from './UserHome';
+import Player from './Player';
 import logo from '../assets/blue-youtube-icon-71.png';
 
 const styles = {
@@ -29,6 +30,7 @@ const styles = {
 const PageControl = () => {
   const [userData, setUserData] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [playList, setPlayList] = useState([]);
   return (
     <Router>
       <Switch>
@@ -70,13 +72,33 @@ const PageControl = () => {
           }
         />
         {isLoggedIn && (
-        <Route
-          path="/:name"
-          exact
-          render={
-            () => <UserHome userData={userData} />
-          }
-        />
+          <>
+            <Route
+              path="/home"
+              exact
+              render={
+                (props) => (
+                  <UserHome
+                    userData={userData}
+                    setPlayList={setPlayList}
+                    history={props.history}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/play"
+              exact
+              render={
+                () => (
+                  <Player
+                    playList={playList}
+                    setPlayList={setPlayList}
+                  />
+                )
+              }
+            />
+          </>
         )}
       </Switch>
     </Router>

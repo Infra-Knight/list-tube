@@ -149,7 +149,7 @@ const LoginPage = ({ history, setIsLoggedIn, setUserData }) => {
           name: usernameAndHashObject.name,
           uuid: usernameAndHashObject.uuid,
         });
-        history.push(`/${usernameAndHashObject.name}`);
+        history.push('/home');
       } setIsWrongPassword(true); setPasswordHelperText('Incorrect password');
     } else { setIsWrongUsername(true); setUsernameHelperText('Incorrect username'); }
     return null;
