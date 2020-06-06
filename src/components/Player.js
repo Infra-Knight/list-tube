@@ -36,7 +36,9 @@ const styles = {
     backgroundColor: '#f1f1f1',
   },
   imgAndTextWrapper: {
+    outline: 'none',
     display: 'flex',
+    cursor: 'pointer',
     fontWeight: '600',
     alignItems: 'center',
   },
@@ -84,6 +86,10 @@ const Player = ({ playList, setPlayList }) => {
   const onDragEnd = () => {
     setDraggedItem(null);
   };
+  const onClick = (item) => {
+    setCurrentSongItem(item);
+    setUrl(item.url);
+  };
 
   return (
     <>
@@ -114,7 +120,13 @@ const Player = ({ playList, setPlayList }) => {
               >
                 <Hamburger />
               </div>
-              <div style={styles.imgAndTextWrapper}>
+              <div
+                tabIndex={0}
+                role="button"
+                onKeyDown={() => null}
+                onClick={() => onClick(item)}
+                style={styles.imgAndTextWrapper}
+              >
                 <img
                   alt="Thumbnail"
                   style={styles.img}
