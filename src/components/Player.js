@@ -3,6 +3,49 @@ import ReactPlayer from 'react-player';
 
 import { ReactComponent as Hamburger } from '../assets/hamburger_icon.svg';
 
+const styles = {
+  wrapper: {
+    display: 'flex',
+    margin: '4vh 3vw 0 3vw',
+    justifyContent: 'space-between',
+  },
+  vieoWrapper: {
+    width: '60vw',
+    height: '33.75vw',
+  },
+  unorderedList: {
+    margin: 0,
+    padding: 0,
+    width: '33vw',
+    height: '96vh',
+    listStyle: 'none',
+    overflow: 'scroll',
+  },
+  list: {
+    display: 'flex',
+    padding: '10px',
+    alignItems: 'center',
+    backgroundColor: '#f1f1f1',
+    borderTop: '1px solid lightgrey',
+  },
+  currentSong: {
+    padding: '7px',
+    display: 'flex',
+    border: 'groove',
+    alignItems: 'center',
+    backgroundColor: '#f1f1f1',
+  },
+  imgAndTextWrapper: {
+    display: 'flex',
+    fontWeight: '600',
+    alignItems: 'center',
+  },
+  img: {
+    width: '120px',
+    marginRight: '15px',
+  },
+};
+
 const Player = ({ playList, setPlayList }) => {
   const [currentSongItem, setCurrentSongItem] = useState(playList[0]);
   const [url, setUrl] = useState(currentSongItem.url);
@@ -44,40 +87,39 @@ const Player = ({ playList, setPlayList }) => {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: '3%' }}>
-        <div>
+      <div style={styles.wrapper}>
+        <div style={styles.vieoWrapper}>
           <ReactPlayer
             url={url}
             playing
             controls
+            width="100%"
+            height="100%"
             onEnded={nextVideo}
           />
         </div>
-        <ul style={{
-          margin: 0,
-          padding: 0,
-          width: '40%',
-          height: '100vh',
-          overflow: 'scroll',
-          listStyle: 'none',
-        }}
-        >
+        <ul style={styles.unorderedList}>
           {playList.map((item, index) => (
             <li
               key={item.youtubeId}
-              style={{
-                display: 'flex',
-                padding: '10px 20px',
-                alignItems: 'center',
-                backgroundColor: '#f1f1f1',
-              }}
               onDragOver={(e) => onDragOver(e, index)}
+              style={item === currentSongItem ? styles.currentSong : styles.list}
             >
-              <div className="drag" draggable onDragStart={(e) => onDragStart(e, index)} onDragEnd={onDragEnd} style={{ cursor: 'grab' }}>
+              <div
+                draggable
+                className="drag"
+                onDragEnd={onDragEnd}
+                onDragStart={(e) => onDragStart(e, index)}
+                style={{ cursor: 'grab', marginRight: '10px' }}
+              >
                 <Hamburger />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <img src={`https://img.youtube.com/vi/${playList[index].youtubeId}/mqdefault.jpg`} alt="Thumbnail" style={{ width: '120px' }} />
+              <div style={styles.imgAndTextWrapper}>
+                <img
+                  alt="Thumbnail"
+                  style={styles.img}
+                  src={`https://img.youtube.com/vi/${playList[index].youtubeId}/mqdefault.jpg`}
+                />
                 {item.name}
               </div>
             </li>
