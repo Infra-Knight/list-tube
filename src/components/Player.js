@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import ReactPlayer from 'react-player';
+import IconButton from '@material-ui/core/IconButton';
+import SkipNextRoundedIcon from '@material-ui/icons/SkipNextRounded';
+import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
+import SkipPreviousRoundedIcon from '@material-ui/icons/SkipPreviousRounded';
+import PauseCircleFilledRoundedIcon from '@material-ui/icons/PauseCircleFilledRounded';
 
 import { ReactComponent as Hamburger } from '../assets/hamburger_icon.svg';
 
@@ -21,9 +26,11 @@ const styles = {
     listStyle: 'none',
     overflow: 'scroll',
   },
-  list: {
+  itemWrapper: {
+    outline: 'none',
     display: 'flex',
     padding: '10px',
+    cursor: 'pointer',
     alignItems: 'center',
     backgroundColor: '#f1f1f1',
     borderTop: '1px solid lightgrey',
@@ -31,14 +38,13 @@ const styles = {
   currentSong: {
     padding: '7px',
     display: 'flex',
+    outline: 'none',
     border: 'groove',
     alignItems: 'center',
     backgroundColor: '#f1f1f1',
   },
   imgAndTextWrapper: {
-    outline: 'none',
     display: 'flex',
-    cursor: 'pointer',
     fontWeight: '600',
     alignItems: 'center',
   },
@@ -51,6 +57,7 @@ const styles = {
 const Player = ({ playList, setPlayList }) => {
   const [currentSongItem, setCurrentSongItem] = useState(playList[0]);
   const [url, setUrl] = useState(currentSongItem.url);
+  const [playing, setPlaying] = useState(true);
   const nextVideo = () => {
     const currentSongIndex = playList.findIndex((item) => item === currentSongItem);
     if (currentSongIndex === playList.length - 1) {
@@ -60,6 +67,16 @@ const Player = ({ playList, setPlayList }) => {
     }
     setCurrentSongItem(playList[currentSongIndex + 1]);
     setUrl(playList[currentSongIndex + 1].url);
+  };
+  const previousVideo = () => {
+    const currentSongIndex = playList.findIndex((item) => item === currentSongItem);
+    if (currentSongIndex === 0) {
+      setCurrentSongItem(playList[playList.length - 1]);
+      setUrl(playList[playList.length - 1].url);
+      return;
+    }
+    setCurrentSongItem(playList[currentSongIndex - 1]);
+    setUrl(playList[currentSongIndex - 1].url);
   };
   const [draggedItem, setDraggedItem] = useState();
   const onDragStart = (e, index) => {
@@ -87,29 +104,66 @@ const Player = ({ playList, setPlayList }) => {
     setDraggedItem(null);
   };
   const onClick = (item) => {
+    if (item === currentSongItem) return;
     setCurrentSongItem(item);
     setUrl(item.url);
   };
 
   return (
-    <>
-      <div style={styles.wrapper}>
+    <div style={styles.wrapper}>
+      <div>
         <div style={styles.vieoWrapper}>
           <ReactPlayer
             url={url}
-            playing
+            playing={playing}
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
             controls
             width="100%"
             height="100%"
             onEnded={nextVideo}
           />
         </div>
-        <ul style={styles.unorderedList}>
-          {playList.map((item, index) => (
-            <li
-              key={item.youtubeId}
-              onDragOver={(e) => onDragOver(e, index)}
-              style={item === currentSongItem ? styles.currentSong : styles.list}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2vh' }}>
+          <div style={{
+            width: '24vw',
+            display: 'flex',
+            borderRadius: '35px',
+            justifyContent: 'center',
+            border: '2px solid lightgray',
+          }}
+          >
+            <IconButton size="small" onClick={previousVideo}>
+              <SkipPreviousRoundedIcon style={{ width: '4vw', height: '4vw' }} />
+            </IconButton>
+            {playing && (
+            <IconButton size="small" onClick={() => { setPlaying(false); }}>
+              <PauseCircleFilledRoundedIcon style={{ width: '4vw', height: '4vw' }} />
+            </IconButton>
+            )}
+            {!playing && (
+            <IconButton size="small" onClick={() => { setPlaying(true); }}>
+              <PlayArrowRoundedIcon style={{ width: '4vw', height: '4vw' }} />
+            </IconButton>
+            )}
+            <IconButton size="small" onClick={nextVideo}>
+              <SkipNextRoundedIcon style={{ width: '4vw', height: '4vw' }} />
+            </IconButton>
+          </div>
+        </div>
+      </div>
+      <ul style={styles.unorderedList}>
+        {playList.map((item, index) => (
+          <li
+            key={item.youtubeId}
+            onDragOver={(e) => onDragOver(e, index)}
+          >
+            <div
+              tabIndex={0}
+              role="button"
+              onKeyDown={() => null}
+              onClick={() => onClick(item)}
+              style={item === currentSongItem ? styles.currentSong : styles.itemWrapper}
             >
               <div
                 draggable
@@ -121,10 +175,6 @@ const Player = ({ playList, setPlayList }) => {
                 <Hamburger />
               </div>
               <div
-                tabIndex={0}
-                role="button"
-                onKeyDown={() => null}
-                onClick={() => onClick(item)}
                 style={styles.imgAndTextWrapper}
               >
                 <img
@@ -134,11 +184,11 @@ const Player = ({ playList, setPlayList }) => {
                 />
                 {item.name}
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
