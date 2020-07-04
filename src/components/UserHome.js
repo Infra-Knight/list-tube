@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import _ from 'lodash';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import Button from '@material-ui/core/Button';
@@ -7,15 +8,30 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
+import TextField from '@material-ui/core/TextField';
 import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
 
+
 import userLists from '../__mockData__';
+
+const styles = {
+  playButton: {
+    display: 'flex',
+    marginTop: '15px',
+    justifyContent: 'center',
+  },
+  center: {
+    display: 'flex',
+    margin: '15px 0px',
+    justifyContent: 'center',
+  },
+};
 
 const UserHome = ({ userData, setPlayList, history }) => {
   const matchedUser = userLists.find(({ uuid }) => uuid === userData.uuid);
   const reversedPlayList = matchedUser.playList.slice(0).reverse();
-  const rows = reversedPlayList;
+  const [searchedRows, setSearchedRows] = useState(reversedPlayList);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -52,12 +68,28 @@ const UserHome = ({ userData, setPlayList, history }) => {
     history.push('/play');
   };
 
+  const searchFunction = (text) => reversedPlayList.filter(
+    (rowItem) => Object.values(rowItem).some(
+      (arrayElement) => arrayElement.toLowerCase().includes(text.toLowerCase()),
+    ),
+  );
+  const onSearchWithDebounce = useCallback(
+    _.debounce((value) => setSearchedRows(searchFunction(value)), 500), [],
+  );
+  const onChange = (event) => onSearchWithDebounce(event.target.value);
+
   return (
     <>
-      <div style={{ margin: '15px 0px', display: 'flex', justifyContent: 'center' }}>
+      <div style={styles.center}>
         {`Welcome ${userData.name} ${userData.uuid}`}
       </div>
-      <div style={{ margin: '15px 0px', display: 'flex', justifyContent: 'center' }}>Select your songs</div>
+      <div style={styles.center}>Create your playlist on the fly</div>
+      <div style={{
+        margin: '15px 30vw', width: '40vw',
+      }}
+      >
+        <TextField id="outlined-search" label="Search anything" type="search" variant="outlined" fullWidth onChange={onChange} />
+      </div>
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
@@ -76,7 +108,7 @@ const UserHome = ({ userData, setPlayList, history }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {searchedRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 const isItemSelected = isSelected(row);
@@ -108,14 +140,14 @@ const UserHome = ({ userData, setPlayList, history }) => {
         <TablePagination
           page={page}
           component="div"
-          count={rows.length}
+          count={searchedRows.length}
           rowsPerPage={rowsPerPage}
           onChangePage={handleChangePage}
           rowsPerPageOptions={[5, 10, 25, 50, 100, 500]}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </TableContainer>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+      <div style={styles.playButton}>
         <Button
           variant="contained"
           onClick={onClickPlay}
